@@ -13,6 +13,7 @@ RUN mkdir -p /home/deploy/.ssh && echo $PUBKEY > /home/deploy/.ssh/authorized_ke
 
 RUN cat /dev/random | base64 | head -c 104857600 > /home/deploy/100MB.dat
 RUN cat /dev/random | base64 | head -c 1024 > /home/deploy/1KB.dat
+RUN echo "MaxStartups 100:30:300" >> /etc/ssh/sshd_config
 
 EXPOSE 22
 CMD [ "/usr/sbin/sshd", "-D" ]
