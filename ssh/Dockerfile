@@ -11,5 +11,8 @@ ENV PUBKEY "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxfArXdO5cKmVyfsoIhzGY52ZPwP3g
 RUN useradd -m deploy -s /bin/bash && echo "deploy:deploy" | chpasswd && echo "deploy ALL=NOPASSWD: ALL" >> /etc/sudoers
 RUN mkdir -p /home/deploy/.ssh && echo $PUBKEY > /home/deploy/.ssh/authorized_keys
 
+RUN cat /dev/random | base64 | head -c 104857600 > /home/deploy/100MB.dat
+RUN cat /dev/random | base64 | head -c 1024 > /home/deploy/1KB.dat
+
 EXPOSE 22
 CMD [ "/usr/sbin/sshd", "-D" ]
