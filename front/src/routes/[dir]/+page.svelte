@@ -1,17 +1,22 @@
 <script lang="ts">
-	import type { Metadata } from '$lib/types';
+	import type { PageData } from './$types';
+	let props: { data: PageData } = $props();
+
+	// Access the dir parameter directly from the page store
+	const currentDir = props.data.dir;
 
 	// save the columns state to local storage
 	$effect(() => {
-		localStorage.setItem('columns-home', columns.toString());
+		localStorage.setItem(`columns-page`, columns.toString());
 	});
 
-	let columns = $state(parseInt(localStorage.getItem('columns-home') || '5'));
+	let columns = $state(parseInt(localStorage.getItem(`columns-page`) || '5'));
 
 	const data = (async () => {
-		return await fetch('/random')
+		return await fetch(`/dir/${currentDir}`)
 			.then((res) => res.json())
-			.then((data) => data as Metadata[]);
+			.then((data) => data as string[])
+			.then((data) => data.map((key) => ({ key, dir: currentDir })));
 	})();
 </script>
 
@@ -30,8 +35,8 @@
 {:then items}
 	<div class="grid grid-cols-{columns} gap-1">
 		{#each items as item}
-			<div class="bg-gray-200">
-				<a href={`/${item.dir}`}>
+			<div class="min-h-32 bg-gray-200">
+				<a href={`/obj/${item.key}`}>
 					<img
 						class="h-full w-full rounded-md object-cover"
 						src={`/obj/${item.key}`}
@@ -40,12 +45,11 @@
 				</a>
 			</div>
 		{/each}
-		<!-- Refresh the page -->
-		<button
-			class="flex min-h-32 items-center justify-center bg-gray-200"
-			onclick={() => location.reload()}
-		>
-			<span>Refresh</span>
-		</button>
+		<!-- Go back to the parent directory -->
+		<a href={`/`}>
+			<div class="flex min-h-32 items-center justify-center bg-gray-200">
+				<span>Back</span>
+			</div>
+		</a>
 	</div>
 {/await}
